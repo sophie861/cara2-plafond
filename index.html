@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CARA II – Plafond textile : accroche et entretien</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--bg:#f3f1ec;--panel:#e8e5dd;--card:#ffffff;--ink:#1f1e1c;--ink2:#5f5d58;--ink3:#8a877f;--line:rgba(0,0,0,.12);--line2:rgba(0,0,0,.28);--sel:rgba(0,0,0,.08);--accent:#D85A30;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#1a1918;--panel:#242321;--card:#2c2b29;--ink:#efede8;--ink2:#b3b0a8;--ink3:#86837c;--line:rgba(255,255,255,.1);--line2:rgba(255,255,255,.28);--sel:rgba(255,255,255,.12)}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#1a1918;--panel:#242321;--card:#2c2b29;--ink:#efede8;--ink2:#b3b0a8;--ink3:#86837c;--line:rgba(255,255,255,.1);--line2:rgba(255,255,255,.28);--sel:rgba(255,255,255,.12)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.55}
+main{max-width:1100px;margin:0 auto;padding:28px 20px 40px}
+h1{font-size:clamp(22px,3.2vw,30px);font-weight:500;letter-spacing:-.01em;margin:0 0 4px}
+.sub{color:var(--ink2);margin:0 0 22px;font-size:15px}
+.tabs{display:inline-flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden;margin:0 0 14px}
+button{font:inherit;font-size:14px;color:var(--ink);background:transparent;border:1px solid var(--line2);border-radius:8px;padding:7px 14px;cursor:pointer}
+button:hover{background:var(--sel)}
+.tabs button{border:none;border-radius:0}.tabs button+button{border-left:1px solid var(--line2)}
+.tabs button.on{background:var(--sel);font-weight:500}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
+#st{font-weight:500;font-size:15px}
+#cp{color:var(--ink2);margin:4px 0 12px;max-width:70ch;font-size:15px}
+#wrap{position:relative;width:100%;height:min(68vh,620px);min-height:380px;border-radius:14px;overflow:hidden;background:var(--panel);touch-action:none;cursor:grab}
+#c{display:block;width:100%;height:100%}
+#labels{position:absolute;inset:0;pointer-events:none}
+.lb{position:absolute;left:0;top:0;font-size:12.5px;line-height:1.3;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:3px 8px;white-space:nowrap;transform:translate(10px,-50%);display:none}
+.lb i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:1px}
+.note{font-size:13px;color:var(--ink3);margin:10px 0 0}
+footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--ink3)}
+</style>
+</head>
+<body>
+<main>
+<h1>CARA II – Plafond textile de l’atelier</h1>
+<p class="sub">Version 3 : chaque lé est découpé en panneaux d’environ 2 m, chacun sur ses propres tubes alu de 2 m. Les tubes sont manchonnés par pas de vis pour former une seule tige par rive, et posés sur des accroches doubles sous les pannes, sans câble tendu. Maquette de principe d’après l’APS studio iroko du 18/11/26, à confirmer par les plans du dessinateur.</p>
+<div class="tabs"><button id="t1">Maquette</button><button id="t2">Entretien : changer un panneau</button></div>
+<div id="rowA"><div class="row"><button id="b1">Vue d’ensemble</button><button id="b2">Détail de la jonction</button><button id="bx">Détail de l’extrémité</button><button id="b3">Décrocher un panneau</button></div><div class="row"><span style="font-size:14px;color:var(--ink2)">Verrouillage</span><div class="tabs" style="margin:0"><button id="vA">Goupille à anneau</button><button id="vB">Vis papillon + rondelle</button></div></div></div>
+<div id="rowB"><div class="row" style="margin:0"><button id="pv" aria-label="Étape précédente">←</button><button id="nx" aria-label="Étape suivante">→</button><span id="st"></span></div><p id="cp"></p></div>
+<div id="wrap"><canvas id="c"></canvas><div id="labels"></div></div>
+<p class="note">Glisser pour tourner, molette ou pincement pour zoomer. Pièces d’accroche légèrement agrandies pour la lisibilité. Portion représentée : boucles R5 à R10, bande A.</p>
+<footer>184Design – document de travail, non contractuel.</footer>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const wrap=$('wrap'),cv=$('c'),lab=$('labels');
+const R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});R.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+const S=new THREE.Scene();const cam=new THREE.PerspectiveCamera(40,1,0.01,200);
+S.add(new THREE.HemisphereLight(0xffffff,0x8f8a80,0.95));const dl=new THREE.DirectionalLight(0xffffff,0.55);dl.position.set(6,12,8);S.add(dl);
+const Y=5.29,xs=[0,2,4,6,6.8,8.8,10.8],fl=[2.73,2.44,2.04,0.98,1.14,0.83],Z0=-4,Z1=4,susZ=[-4,-2,0,2,4],OFF=0.035,TR=0.0125,FR=0.019,G=0.02;
+const M=(c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:0.7},o||{}));
+const mFab=M(0xf4f0e7,{transparent:true,opacity:0.8,side:THREE.DoubleSide,roughness:0.95});
+const mSteel=M(0x9a9da2,{metalness:0.6,roughness:0.3}),mDark=M(0x33363b),mLock=M(0xD85A30,{roughness:0.6});
+const mAlu=M(0xc9ccd0,{metalness:0.7,roughness:0.3}),mWash=M(0x6f7277,{metalness:0.6,roughness:0.35}),mSleeve=M(0xe6e0d2,{transparent:true,opacity:0.95,side:THREE.DoubleSide,roughness:0.95});
+const mLift=M(0xBA7517,{roughness:0.6}),mRail=M(0x5F5E5A,{roughness:0.5});
+const UP=new THREE.Vector3(0,1,0),V=(x,y,z)=>new THREE.Vector3(x,y,z);
+function cyl(a,b,r,m,par){const d=new THREE.Vector3().subVectors(b,a);const me=new THREE.Mesh(new THREE.CylinderGeometry(r,r,d.length(),20),m);me.position.copy(a).add(b).multiplyScalar(0.5);me.quaternion.setFromUnitVectors(UP,d.clone().normalize());(par||S).add(me);return me;}
+function box(w,h,d,p,m,par){const me=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);me.position.copy(p);(par||S).add(me);return me;}
+const fl0=new THREE.Mesh(new THREE.PlaneGeometry(40,30),M(0xcdc8bd,{roughness:1}));fl0.rotation.x=-Math.PI/2;fl0.position.set(5.4,0,0);S.add(fl0);
+susZ.forEach(z=>box(14,0.2,0.07,V(5.4,7.62,z),mDark));
+cyl(V(-1.6,6.0,-1),V(12.4,6.0,-1),0.35,M(0xbfc2c6,{metalness:0.5,roughness:0.4}));
+function hook(xt,z){const t=new THREE.Mesh(new THREE.TorusGeometry(0.022,0.0035,8,20,Math.PI),mDark);t.rotation.z=Math.PI;t.position.set(xt,Y,z);S.add(t);
+box(0.006,0.062,0.007,V(xt-0.022,Y+0.031,z),mDark);box(0.006,0.062,0.007,V(xt+0.022,Y+0.031,z),mDark);}
+xs.forEach(x=>{susZ.forEach(z=>{cyl(V(x,7.5,z),V(x,Y+0.066,z),0.004,mSteel);box(0.09,0.07,0.12,V(x,7.49,z),mDark);box(0.03,0.07,0.03,V(x,Y+0.45,z),mDark);
+box(0.13,0.008,0.04,V(x,Y+0.064,z),mDark);hook(x-OFF,z);hook(x+OFF,z);});});
+function prof(s,f){const p=[];const r=s/2;if(f>=r){const d=f-r;p.push([0,0],[0,-d]);for(let k=1;k<24;k++){const t=Math.PI+Math.PI*k/24;p.push([r+r*Math.cos(t),-d+r*Math.sin(t)]);}p.push([s,-d],[s,0]);}else{const Rr=(r*r+f*f)/(2*f),cy=-f+Rr,ta=Math.atan2(-cy,-r),tb=Math.atan2(-cy,r);for(let k=0;k<=24;k++){const t=ta+(tb-ta)*k/24;p.push([r+Rr*Math.cos(t),cy+Rr*Math.sin(t)]);}}return p;}
+const washer=(x,z,r,g)=>cyl(V(x,Y,z-0.0015),V(x,Y,z+0.0015),r,mWash,g);
+const panels=[],locks=[];
+function lock(xt,z,s,li,pz){const A=[],B=[];
+A.push(cyl(V(xt-0.034,Y,z),V(xt+0.034,Y,z),0.0028,mLock));const ring=new THREE.Mesh(new THREE.TorusGeometry(0.013,0.0028,8,20),mLock);ring.rotation.y=Math.PI/2;ring.position.set(xt+s*0.036,Y-0.01,z);S.add(ring);A.push(ring);
+B.push(cyl(V(xt+s*0.024,Y,z),V(xt+s*0.028,Y,z),0.016,mLock));B.push(cyl(V(xt,Y,z),V(xt+s*0.042,Y,z),0.003,mLock));B.push(box(0.005,0.036,0.009,V(xt+s*0.042,Y,z),mLock));
+locks.push({li:li,z:z,A:A,B:B});}
+function endCap(xt,z,d,g){washer(xt,z+d*0.004,0.032,g);const A=[],B=[];
+cyl(V(xt,Y,z+d*0.004),V(xt,Y,z-d*0.03),0.003,mLock,g);const ring=new THREE.Mesh(new THREE.TorusGeometry(0.012,0.0028,8,20),mLock);ring.position.set(xt,Y-0.012,z+d*0.01);g.add(ring);A.push(ring);A.push(g.children[g.children.length-2]);
+B.push(cyl(V(xt,Y,z+d*0.006),V(xt,Y,z+d*0.012),0.008,mLock,g));B.push(box(0.04,0.009,0.005,V(xt,Y,z+d*0.014),mLock,g));
+locks.push({li:-2,z:z,A:A,B:B});}
+for(let i=0;i<6;i++){const xl=xs[i]+OFF,xr=xs[i+1]-OFF,pts=prof(xr-xl,fl[i]);const lp=[];
+for(let p=0;p<susZ.length-1;p++){const g=new THREE.Group();const za=susZ[p]+G,zb=susZ[p+1]-G,nz=10,pos=[],idx=[];
+for(let j=0;j<=nz;j++){const z=za+(zb-za)*j/nz;pts.forEach(q=>pos.push(xl+q[0],Y-FR*0.6+q[1],z));}
+const n=pts.length;for(let j=0;j<nz;j++)for(let k=0;k<n-1;k++){const a=j*n+k,b=a+1,c=a+n,d=c+1;idx.push(a,c,b,b,c,d);}
+const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setIndex(idx);geo.computeVertexNormals();g.add(new THREE.Mesh(geo,mFab));
+[xl,xr].forEach(xt=>{cyl(V(xt,Y,susZ[p]+0.012),V(xt,Y,susZ[p+1]-0.012),TR,mAlu,g);cyl(V(xt,Y,za),V(xt,Y,zb),FR,mSleeve,g);
+if(p>0)washer(xt,susZ[p]+0.014,0.028,g);else endCap(xt,susZ[p],-1,g);
+if(p<susZ.length-2)washer(xt,susZ[p+1]-0.014,0.028,g);else endCap(xt,susZ[p+1],1,g);});
+g.userData={ty:0,tz:0};S.add(g);lp.push(g);}
+panels.push(lp);
+susZ.forEach((z,k)=>{lock(xl,z,1,i);lock(xr,z,-1,i);if(k>0&&k<susZ.length-1){cyl(V(xl,Y,z-0.012),V(xl,Y,z+0.012),0.016,mDark);cyl(V(xr,Y,z-0.012),V(xr,Y,z+0.012),0.016,mDark);}});}
+const TP=panels[1][3];
+const tLocks=locks.filter(l=>l.li===1&&(l.z===2||l.z===4)).sort((a,b)=>b.z-a.z);
+function makeLift(LX,LZ){const lift=new THREE.Group();box(1.1,0.35,2.2,V(LX,0.25,LZ),mLift,lift);
+for(let k=0;k<5;k++){const y0=0.45+k*0.62,y1=y0+0.62;[-0.5,0.5].forEach(dx=>{cyl(V(LX+dx,y0,LZ-0.9),V(LX+dx,y1,LZ+0.9),0.03,mRail,lift);cyl(V(LX+dx,y0,LZ+0.9),V(LX+dx,y1,LZ-0.9),0.03,mRail,lift);});}
+box(1.1,0.08,2.2,V(LX,3.6,LZ),mLift,lift);[[-0.53,-1.08],[0.53,-1.08],[-0.53,1.08],[0.53,1.08]].forEach(p=>cyl(V(LX+p[0],3.64,LZ+p[1]),V(LX+p[0],4.7,LZ+p[1]),0.02,mLift,lift));
+box(1.1,0.03,0.03,V(LX,4.7,LZ-1.08),mLift,lift);box(1.1,0.03,0.03,V(LX,4.7,LZ+1.08),mLift,lift);box(0.03,0.03,2.2,V(LX-0.53,4.7,LZ),mLift,lift);box(0.03,0.03,2.2,V(LX+0.53,4.7,LZ),mLift,lift);
+lift.visible=false;S.add(lift);return lift;}
+const LZ=Z1+1.5,lifts=[makeLift(2,LZ),makeLift(4,LZ)];
+const L=[
+{t:'Une tige par rive : tubes de 2 m manchonnés',p:V(4.035,Y,Z1+0.05),v:['e']},
+{t:'Panneaux d’environ 2 m, jour entre panneaux',p:V(3,Y-2.1,0),v:['e']},
+{t:'Suspente Ø2 + Gripple',p:V(6,6.5,2),v:['e']},
+{t:'Pince de poutre sur panne Z200',p:V(8.8,7.5,-4),v:['e']},
+{t:'Gaine de soufflage',p:V(11,6.0,-1),v:['e']},
+{t:'Manchon fileté : jonction des tubes de 2 m',p:V(2.035,Y-0.016,0),v:['d']},
+{t:'Rondelles : les panneaux ne se chevauchent pas',p:V(2.035,Y+0.028,0.014),v:['d']},
+{t:'Accroche double : un crochet par lé',p:V(2,Y+0.064,0),v:['d']},
+{t:'',p:V(2.071,Y-0.01,0),v:['d'],lock:'mid'},
+{t:'Tube alu Ø25 dans fourreau cousu',p:V(1.965,Y,-0.45),v:['d']},
+{t:'Pastille d’extrémité : le tissu ne peut pas glisser',p:V(2.035,Y+0.032,Z1+0.004),v:['x']},
+{t:'',p:V(2.035,Y-0.012,Z1+0.012),v:['x'],lock:'end'},
+{t:'Dernière accroche de la ligne',p:V(2,Y+0.064,Z1),v:['x']},
+{t:'Panneau R6 / bande A / n° 4',p:V(3,Y-2.44,3),v:['s1']},
+{t:'Deux nacelles, une par rive',p:V(3,4.6,LZ),v:['s1','s4']},
+{t:'Verrouillages retirés, pièces imperdables',p:V(2.071,Y-0.01,2),v:['s2']},
+{t:'Manchon : on dévisse le tube du panneau',p:V(2.035,Y-0.016,2),v:['s3']},
+{t:'Le reste de la ligne ne bouge pas',p:V(2.035,Y,0.8),v:['s3']},
+{t:'Le panneau descend, ses tubes avec lui',p:V(3,3.6,3),v:['s4']},
+{t:'Tube revissé, rondelles en place',p:V(3.965,Y-0.016,2),v:['s5']},
+{t:'Verrouillages remis',p:V(3.965,Y,3),v:['s5']}];
+L.forEach(l=>{const e=document.createElement('div');e.className='lb';e.innerHTML='<i></i><span></span>';e.lastChild.textContent=l.t;lab.appendChild(e);l.el=e;});
+const P={e:{tx:5.4,ty:4.4,tz:0,r:17,th:0.7,ph:1.72},d:{tx:2,ty:Y,tz:0,r:0.6,th:0.85,ph:1.3},x:{tx:2,ty:Y,tz:Z1,r:0.55,th:0.5,ph:1.3},
+s1:{tx:3,ty:3.8,tz:3,r:9,th:0.45,ph:1.62},s2:{tx:2,ty:Y,tz:3,r:2.4,th:0.7,ph:1.3},s3:{tx:2,ty:Y,tz:2,r:0.7,th:0.9,ph:1.3},s4:{tx:3,ty:3.6,tz:3.4,r:9,th:0.5,ph:1.6},s5:{tx:4,ty:Y,tz:2.4,r:1.6,th:0.55,ph:1.32}};
+const STEPS=[
+{k:'s1',n:'Repérer le panneau',c:'On repère le panneau à changer grâce à son étiquette (boucle / bande / n°). Ici, le dernier panneau du lé R6.',open:0,y:0,z:0,vis:true},
+{k:'s2',n:'Déverrouiller ses accroches',c:'On retire les verrouillages des deux accroches du panneau, sur les deux rives. Les pièces restent attachées à l’accroche.',open:1,y:0,z:0,vis:true},
+{k:'s3',n:'Dévisser au manchon',c:'Sur chaque rive, on dévisse le tube du panneau au niveau du manchon. Le reste de la tige et les panneaux voisins ne bougent pas.',open:1,y:0,z:0.06,vis:true},
+{k:'s4',n:'Descendre le panneau',c:'Le panneau descend avec ses deux tubes de 2 m : environ 3 à 4 kg en tout. Au sol, on sort les tubes et le tissu part au lavage, ou on enfile un panneau de rechange.',open:1,y:-1.2,z:0.06,vis:true},
+{k:'s5',n:'Reposer et revisser',c:'On remonte le panneau, on revisse ses tubes dans les manchons, on les pose dans les crochets et on remet les verrouillages. Le point bas revient à sa cote.',open:0,y:0,z:0,vis:true}];
+let tab='A',step=0,view='e',cur=Object.assign({},P.e),goal=null,openP=0,openT=0,variant='A';
+function setVariant(v){variant=v;$('vA').classList.toggle('on',v==='A');$('vB').classList.toggle('on',v==='B');
+L.forEach(l=>{if(l.lock==='mid')l.el.lastChild.textContent=v==='A'?'Goupille à anneau imperdable':'Vis papillon + rondelle imperdables';if(l.lock==='end')l.el.lastChild.textContent=v==='A'?'Goupille rentrante dans le tube, à anneau':'Vis à tête large dans le tube taraudé';});}
+function go(v){view=v;goal=Object.assign({},P[v]);}
+function setStep(i){step=Math.max(0,Math.min(STEPS.length-1,i));const s=STEPS[step];$('st').textContent='Étape '+(step+1)+'/'+STEPS.length+' : '+s.n;$('cp').textContent=s.c;
+if(step===4&&openP<0.5)openP=1;openT=s.open;TP.userData.ty=s.y;TP.userData.tz=s.z;go(s.k);}
+function setTab(t){tab=t;$('rowA').style.display=t==='A'?'block':'none';$('rowB').style.display=t==='B'?'block':'none';
+$('t1').classList.toggle('on',t==='A');$('t2').classList.toggle('on',t==='B');
+lifts.forEach(l=>l.visible=t==='B');TP.userData.ty=0;TP.userData.tz=0;openT=0;$('b3').textContent='Décrocher un panneau';
+if(t==='A'){go('e');if(location.hash==='#entretien')location.hash='maquette';}else{setStep(0);if(location.hash!=='#entretien')location.hash='entretien';}}
+$('t1').onclick=()=>setTab('A');$('t2').onclick=()=>setTab('B');$('vA').onclick=()=>setVariant('A');$('vB').onclick=()=>setVariant('B');
+$('b1').onclick=()=>go('e');$('b2').onclick=()=>go('d');$('bx').onclick=()=>go('x');
+$('b3').onclick=()=>{const down=!TP.userData.ty;TP.userData.ty=down?-1.4:0;TP.userData.tz=down?0.06:0;openT=down?1:0;if(down)openP=1;$('b3').textContent=down?'Raccrocher le panneau':'Décrocher un panneau';};
+$('pv').onclick=()=>setStep(step-1);$('nx').onclick=()=>setStep(step+1);
+const ptrs=new Map();let pinch=0;
+wrap.addEventListener('pointerdown',e=>{ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});goal=null;wrap.setPointerCapture(e.pointerId);wrap.style.cursor='grabbing';if(ptrs.size===2){const a=[...ptrs.values()];pinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);}});
+wrap.addEventListener('pointermove',e=>{if(!ptrs.has(e.pointerId))return;const pr=ptrs.get(e.pointerId);
+if(ptrs.size===1){cur.th-=(e.clientX-pr.x)*0.006;cur.ph=Math.max(0.2,Math.min(2.9,cur.ph-(e.clientY-pr.y)*0.006));}
+ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+if(ptrs.size===2){const a=[...ptrs.values()];const d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(pinch>0)cur.r=Math.max(0.2,Math.min(40,cur.r*pinch/d));pinch=d;}});
+const up=e=>{ptrs.delete(e.pointerId);pinch=0;if(!ptrs.size)wrap.style.cursor='grab';};wrap.addEventListener('pointerup',up);wrap.addEventListener('pointercancel',up);
+wrap.addEventListener('wheel',e=>{e.preventDefault();goal=null;cur.r=Math.max(0.2,Math.min(40,cur.r*Math.exp(e.deltaY*0.001)));},{passive:false});
+function size(){const w=wrap.clientWidth,h=wrap.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+new ResizeObserver(size).observe(wrap);size();setVariant('A');
+setTab(location.hash==='#entretien'?'B':'A');
+window.addEventListener('hashchange',()=>{const t=location.hash==='#entretien'?'B':'A';if(t!==tab)setTab(t);});
+const tmp=new THREE.Vector3();
+function loop(){if(goal){let done=true;for(const k in goal){cur[k]+=(goal[k]-cur[k])*0.07;if(Math.abs(goal[k]-cur[k])>0.001)done=false;}if(done)goal=null;}
+cam.position.set(cur.tx+cur.r*Math.sin(cur.ph)*Math.sin(cur.th),cur.ty+cur.r*Math.cos(cur.ph),cur.tz+cur.r*Math.sin(cur.ph)*Math.cos(cur.th));cam.lookAt(cur.tx,cur.ty,cur.tz);
+const dz=openT-openP;openP+=Math.sign(dz)*Math.min(Math.abs(dz),0.01);
+const nt=tLocks.length;locks.forEach(l=>{let off=false;const i=tLocks.indexOf(l);if(i>=0)off=openP>(i+0.5)/nt;l.A.forEach(m=>m.visible=!off&&variant==='A');l.B.forEach(m=>m.visible=!off&&variant==='B');});
+const ud=TP.userData;TP.position.z+=(ud.tz-TP.position.z)*0.06;if(Math.abs(TP.position.z-ud.tz)<0.01||ud.ty>TP.position.y-0.001)TP.position.y+=(ud.ty-TP.position.y)*0.05;
+R.render(S,cam);const w=wrap.clientWidth,h=wrap.clientHeight;
+L.forEach(l=>{if(l.v.indexOf(view)<0){l.el.style.display='none';return;}tmp.copy(l.p).project(cam);if(tmp.z>1||Math.abs(tmp.x)>1.1||Math.abs(tmp.y)>1.1){l.el.style.display='none';return;}l.el.style.display='block';l.el.style.left=((tmp.x+1)/2*w)+'px';l.el.style.top=((1-tmp.y)/2*h)+'px';});
+requestAnimationFrame(loop);}
+loop();
+</script>
+</body>
+</html>
