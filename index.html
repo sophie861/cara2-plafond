@@ -36,9 +36,9 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);font-si
 <body>
 <main>
 <h1>CARA II – Plafond textile de l’atelier</h1>
-<p class="sub">Version 3 : chaque lé est découpé en panneaux d’environ 2 m, chacun sur ses propres tubes alu de 2 m. Les tubes sont manchonnés par pas de vis pour former une seule tige par rive, et posés sur des accroches doubles sous les pannes, sans câble tendu. Maquette de principe d’après l’APS studio iroko du 18/11/26, à confirmer par les plans du dessinateur.</p>
-<div class="tabs"><button id="t1">Maquette</button><button id="t2">Entretien : changer un panneau</button></div>
-<div id="rowA"><div class="row"><button id="b1">Vue d’ensemble</button><button id="b2">Détail de la jonction</button><button id="bx">Détail de l’extrémité</button><button id="b3">Décrocher un panneau</button></div><div class="row"><span style="font-size:14px;color:var(--ink2)">Verrouillage</span><div class="tabs" style="margin:0"><button id="vA">Goupille à anneau</button><button id="vB">Vis papillon + rondelle</button></div></div></div>
+<p class="sub">Version 4 : 47 lés continus. Chaque rive de lé est portée par des tubes alu de 2 m manchonnés par pas de vis, qui forment une seule tige par rive, glissée dans un fourreau cousu fermé interrompu à chaque accroche. Les tiges reposent sur des accroches doubles sous les pannes, sans câble tendu. Maquette de principe d’après l’APS studio iroko du 18/11/26, à confirmer par les plans du dessinateur.</p>
+<div class="tabs"><button id="t1">Maquette</button><button id="t2">Entretien : décrocher un lé</button></div>
+<div id="rowA"><div class="row"><button id="b1">Vue d’ensemble</button><button id="b2">Détail de la jonction</button><button id="bx">Détail de l’extrémité</button><button id="b3">Décrocher un lé</button></div><div class="row"><span style="font-size:14px;color:var(--ink2)">Verrouillage</span><div class="tabs" style="margin:0"><button id="vA">Goupille à anneau</button><button id="vB">Vis papillon + rondelle</button></div></div></div>
 <div id="rowB"><div class="row" style="margin:0"><button id="pv" aria-label="Étape précédente">←</button><button id="nx" aria-label="Étape suivante">→</button><span id="st"></span></div><p id="cp"></p></div>
 <div id="wrap"><canvas id="c"></canvas><div id="labels"></div></div>
 <p class="note">Glisser pour tourner, molette ou pincement pour zoomer. Pièces d’accroche légèrement agrandies pour la lisibilité. Portion représentée : boucles R5 à R10, bande A.</p>
@@ -78,19 +78,21 @@ function endCap(xt,z,d,g){washer(xt,z+d*0.004,0.032,g);const A=[],B=[];
 cyl(V(xt,Y,z+d*0.004),V(xt,Y,z-d*0.03),0.003,mLock,g);const ring=new THREE.Mesh(new THREE.TorusGeometry(0.012,0.0028,8,20),mLock);ring.position.set(xt,Y-0.012,z+d*0.01);g.add(ring);A.push(ring);A.push(g.children[g.children.length-2]);
 B.push(cyl(V(xt,Y,z+d*0.006),V(xt,Y,z+d*0.012),0.008,mLock,g));B.push(box(0.04,0.009,0.005,V(xt,Y,z+d*0.014),mLock,g));
 locks.push({li:-2,z:z,A:A,B:B});}
-for(let i=0;i<6;i++){const xl=xs[i]+OFF,xr=xs[i+1]-OFF,pts=prof(xr-xl,fl[i]);const lp=[];
-for(let p=0;p<susZ.length-1;p++){const g=new THREE.Group();const za=susZ[p]+G,zb=susZ[p+1]-G,nz=10,pos=[],idx=[];
+const leGroups=[];
+for(let i=0;i<6;i++){const xl=xs[i]+OFF,xr=xs[i+1]-OFF,pts=prof(xr-xl,fl[i]);const g=new THREE.Group();
+{const za=Z0+0.005,zb=Z1-0.005,nz=40,pos=[],idx=[];
 for(let j=0;j<=nz;j++){const z=za+(zb-za)*j/nz;pts.forEach(q=>pos.push(xl+q[0],Y-FR*0.6+q[1],z));}
 const n=pts.length;for(let j=0;j<nz;j++)for(let k=0;k<n-1;k++){const a=j*n+k,b=a+1,c=a+n,d=c+1;idx.push(a,c,b,b,c,d);}
-const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setIndex(idx);geo.computeVertexNormals();g.add(new THREE.Mesh(geo,mFab));
+const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setIndex(idx);geo.computeVertexNormals();g.add(new THREE.Mesh(geo,mFab));}
+for(let p=0;p<susZ.length-1;p++){const za=susZ[p]+G,zb=susZ[p+1]-G;
 [xl,xr].forEach(xt=>{cyl(V(xt,Y,susZ[p]+0.012),V(xt,Y,susZ[p+1]-0.012),TR,mAlu,g);cyl(V(xt,Y,za),V(xt,Y,zb),FR,mSleeve,g);
 if(p>0)washer(xt,susZ[p]+0.014,0.028,g);else endCap(xt,susZ[p],-1,g);
-if(p<susZ.length-2)washer(xt,susZ[p+1]-0.014,0.028,g);else endCap(xt,susZ[p+1],1,g);});
-g.userData={ty:0,tz:0};S.add(g);lp.push(g);}
-panels.push(lp);
-susZ.forEach((z,k)=>{lock(xl,z,1,i);lock(xr,z,-1,i);if(k>0&&k<susZ.length-1){cyl(V(xl,Y,z-0.012),V(xl,Y,z+0.012),0.016,mDark);cyl(V(xr,Y,z-0.012),V(xr,Y,z+0.012),0.016,mDark);}});}
-const TP=panels[1][3];
-const tLocks=locks.filter(l=>l.li===1&&(l.z===2||l.z===4)).sort((a,b)=>b.z-a.z);
+if(p<susZ.length-2)washer(xt,susZ[p+1]-0.014,0.028,g);else endCap(xt,susZ[p+1],1,g);});}
+susZ.forEach((z,k)=>{if(k>0&&k<susZ.length-1){cyl(V(xl,Y,z-0.012),V(xl,Y,z+0.012),0.016,mDark,g);cyl(V(xr,Y,z-0.012),V(xr,Y,z+0.012),0.016,mDark,g);}});
+g.userData={ty:0,tz:0};S.add(g);leGroups.push(g);
+susZ.forEach(z=>{lock(xl,z,1,i);lock(xr,z,-1,i);});}
+const TP=leGroups[1];
+const tLocks=locks.filter(l=>l.li===1).sort((a,b)=>b.z-a.z);
 function makeLift(LX,LZ){const lift=new THREE.Group();box(1.1,0.35,2.2,V(LX,0.25,LZ),mLift,lift);
 for(let k=0;k<5;k++){const y0=0.45+k*0.62,y1=y0+0.62;[-0.5,0.5].forEach(dx=>{cyl(V(LX+dx,y0,LZ-0.9),V(LX+dx,y1,LZ+0.9),0.03,mRail,lift);cyl(V(LX+dx,y0,LZ+0.9),V(LX+dx,y1,LZ-0.9),0.03,mRail,lift);});}
 box(1.1,0.08,2.2,V(LX,3.6,LZ),mLift,lift);[[-0.53,-1.08],[0.53,-1.08],[-0.53,1.08],[0.53,1.08]].forEach(p=>cyl(V(LX+p[0],3.64,LZ+p[1]),V(LX+p[0],4.7,LZ+p[1]),0.02,mLift,lift));
@@ -99,35 +101,35 @@ lift.visible=false;S.add(lift);return lift;}
 const LZ=Z1+1.5,lifts=[makeLift(2,LZ),makeLift(4,LZ)];
 const L=[
 {t:'Une tige par rive : tubes de 2 m manchonnés',p:V(4.035,Y,Z1+0.05),v:['e']},
-{t:'Panneaux d’environ 2 m, jour entre panneaux',p:V(3,Y-2.1,0),v:['e']},
+{t:'Lé continu, fourreau interrompu à chaque accroche',p:V(3,Y-2.1,0),v:['e']},
 {t:'Suspente Ø2 + Gripple',p:V(6,6.5,2),v:['e']},
 {t:'Pince de poutre sur panne Z200',p:V(8.8,7.5,-4),v:['e']},
 {t:'Gaine de soufflage',p:V(11,6.0,-1),v:['e']},
-{t:'Manchon fileté : jonction des tubes de 2 m',p:V(2.035,Y-0.016,0),v:['d']},
-{t:'Rondelles : les panneaux ne se chevauchent pas',p:V(2.035,Y+0.028,0.014),v:['d']},
+{t:'Manchon fileté : jonction des tubes de 2 m',p:V(2.035,Y-0.03,-0.03),v:['d']},
+{t:'Rondelles : tiennent les tronçons de fourreau',p:V(2.035,Y+0.028,0.014),v:['d']},
 {t:'Accroche double : un crochet par lé',p:V(2,Y+0.064,0),v:['d']},
 {t:'',p:V(2.071,Y-0.01,0),v:['d'],lock:'mid'},
 {t:'Tube alu Ø25 dans fourreau cousu',p:V(1.965,Y,-0.45),v:['d']},
 {t:'Pastille d’extrémité : le tissu ne peut pas glisser',p:V(2.035,Y+0.032,Z1+0.004),v:['x']},
 {t:'',p:V(2.035,Y-0.012,Z1+0.012),v:['x'],lock:'end'},
 {t:'Dernière accroche de la ligne',p:V(2,Y+0.064,Z1),v:['x']},
-{t:'Panneau R6 / bande A / n° 4',p:V(3,Y-2.44,3),v:['s1']},
+{t:'Étiquette du lé : R6 / bande A',p:V(3,Y-2.44,3),v:['s1']},
 {t:'Deux nacelles, une par rive',p:V(3,4.6,LZ),v:['s1','s4']},
 {t:'Verrouillages retirés, pièces imperdables',p:V(2.071,Y-0.01,2),v:['s2']},
-{t:'Manchon : on dévisse le tube du panneau',p:V(2.035,Y-0.016,2),v:['s3']},
-{t:'Le reste de la ligne ne bouge pas',p:V(2.035,Y,0.8),v:['s3']},
-{t:'Le panneau descend, ses tubes avec lui',p:V(3,3.6,3),v:['s4']},
-{t:'Tube revissé, rondelles en place',p:V(3.965,Y-0.016,2),v:['s5']},
+{t:'La tige se soulève hors des crochets',p:V(2.035,Y-0.016,2),v:['s3']},
+{t:'Accroches et suspentes restent en place',p:V(1.965,Y,0.8),v:['s3']},
+{t:'Le lé descend avec ses deux tiges',p:V(3,3.6,3),v:['s4']},
+{t:'Tige reposée dans ses crochets',p:V(3.965,Y-0.016,2),v:['s5']},
 {t:'Verrouillages remis',p:V(3.965,Y,3),v:['s5']}];
 L.forEach(l=>{const e=document.createElement('div');e.className='lb';e.innerHTML='<i></i><span></span>';e.lastChild.textContent=l.t;lab.appendChild(e);l.el=e;});
 const P={e:{tx:5.4,ty:4.4,tz:0,r:17,th:0.7,ph:1.72},d:{tx:2,ty:Y,tz:0,r:0.6,th:0.85,ph:1.3},x:{tx:2,ty:Y,tz:Z1,r:0.55,th:0.5,ph:1.3},
-s1:{tx:3,ty:3.8,tz:3,r:9,th:0.45,ph:1.62},s2:{tx:2,ty:Y,tz:3,r:2.4,th:0.7,ph:1.3},s3:{tx:2,ty:Y,tz:2,r:0.7,th:0.9,ph:1.3},s4:{tx:3,ty:3.6,tz:3.4,r:9,th:0.5,ph:1.6},s5:{tx:4,ty:Y,tz:2.4,r:1.6,th:0.55,ph:1.32}};
+s1:{tx:3,ty:3.8,tz:3,r:9,th:0.45,ph:1.62},s2:{tx:2,ty:Y,tz:1,r:4.5,th:0.7,ph:1.3},s3:{tx:2,ty:Y,tz:2,r:0.8,th:0.9,ph:1.3},s4:{tx:3,ty:3.6,tz:3.4,r:9,th:0.5,ph:1.6},s5:{tx:4,ty:Y,tz:2,r:1.6,th:0.55,ph:1.32}};
 const STEPS=[
-{k:'s1',n:'Repérer le panneau',c:'On repère le panneau à changer grâce à son étiquette (boucle / bande / n°). Ici, le dernier panneau du lé R6.',open:0,y:0,z:0,vis:true},
-{k:'s2',n:'Déverrouiller ses accroches',c:'On retire les verrouillages des deux accroches du panneau, sur les deux rives. Les pièces restent attachées à l’accroche.',open:1,y:0,z:0,vis:true},
-{k:'s3',n:'Dévisser au manchon',c:'Sur chaque rive, on dévisse le tube du panneau au niveau du manchon. Le reste de la tige et les panneaux voisins ne bougent pas.',open:1,y:0,z:0.06,vis:true},
-{k:'s4',n:'Descendre le panneau',c:'Le panneau descend avec ses deux tubes de 2 m : environ 3 à 4 kg en tout. Au sol, on sort les tubes et le tissu part au lavage, ou on enfile un panneau de rechange.',open:1,y:-1.2,z:0.06,vis:true},
-{k:'s5',n:'Reposer et revisser',c:'On remonte le panneau, on revisse ses tubes dans les manchons, on les pose dans les crochets et on remet les verrouillages. Le point bas revient à sa cote.',open:0,y:0,z:0,vis:true}];
+{k:'s1',n:'Repérer le lé',c:'Deux monteurs, chacun sur sa nacelle sous une rive, repèrent l’étiquette du lé à décrocher.',open:0,y:0,z:0,vis:true},
+{k:'s2',n:'Déverrouiller',c:'On retire les verrouillages de toutes les accroches du lé, sur les deux rives (jusqu’à 7 par rive pour un lé de 12 m). Les pièces restent attachées à l’accroche.',open:1,y:0,z:0,vis:true},
+{k:'s3',n:'Soulever les tiges',c:'Les deux monteurs soulèvent les tiges hors des crochets en avançant le long de la ligne. Les accroches et les suspentes ne bougent pas.',open:1,y:0.03,z:0,vis:true},
+{k:'s4',n:'Descendre le lé',c:'Le lé descend avec ses deux tiges. Au sol, on dévisse les tubes aux manchons pour les sortir des fourreaux, et le lé part au lavage. Un tube abîmé se remplace seul, sans toucher au tissu.',open:1,y:-1.2,z:0,vis:true},
+{k:'s5',n:'Reposer',c:'On renfile les tubes, on les revisse, on pose les deux tiges dans leurs crochets et on remet les verrouillages. Le point bas revient à sa cote.',open:0,y:0,z:0,vis:true}];
 let tab='A',step=0,view='e',cur=Object.assign({},P.e),goal=null,openP=0,openT=0,variant='A';
 function setVariant(v){variant=v;$('vA').classList.toggle('on',v==='A');$('vB').classList.toggle('on',v==='B');
 L.forEach(l=>{if(l.lock==='mid')l.el.lastChild.textContent=v==='A'?'Goupille à anneau imperdable':'Vis papillon + rondelle imperdables';if(l.lock==='end')l.el.lastChild.textContent=v==='A'?'Goupille rentrante dans le tube, à anneau':'Vis à tête large dans le tube taraudé';});}
@@ -136,11 +138,11 @@ function setStep(i){step=Math.max(0,Math.min(STEPS.length-1,i));const s=STEPS[st
 if(step===4&&openP<0.5)openP=1;openT=s.open;TP.userData.ty=s.y;TP.userData.tz=s.z;go(s.k);}
 function setTab(t){tab=t;$('rowA').style.display=t==='A'?'block':'none';$('rowB').style.display=t==='B'?'block':'none';
 $('t1').classList.toggle('on',t==='A');$('t2').classList.toggle('on',t==='B');
-lifts.forEach(l=>l.visible=t==='B');TP.userData.ty=0;TP.userData.tz=0;openT=0;$('b3').textContent='Décrocher un panneau';
+lifts.forEach(l=>l.visible=t==='B');TP.userData.ty=0;TP.userData.tz=0;openT=0;$('b3').textContent='Décrocher un lé';
 if(t==='A'){go('e');if(location.hash==='#entretien')location.hash='maquette';}else{setStep(0);if(location.hash!=='#entretien')location.hash='entretien';}}
 $('t1').onclick=()=>setTab('A');$('t2').onclick=()=>setTab('B');$('vA').onclick=()=>setVariant('A');$('vB').onclick=()=>setVariant('B');
 $('b1').onclick=()=>go('e');$('b2').onclick=()=>go('d');$('bx').onclick=()=>go('x');
-$('b3').onclick=()=>{const down=!TP.userData.ty;TP.userData.ty=down?-1.4:0;TP.userData.tz=down?0.06:0;openT=down?1:0;if(down)openP=1;$('b3').textContent=down?'Raccrocher le panneau':'Décrocher un panneau';};
+$('b3').onclick=()=>{const down=!TP.userData.ty;TP.userData.ty=down?-1.4:0;TP.userData.tz=0;openT=down?1:0;if(down)openP=1;$('b3').textContent=down?'Raccrocher le lé':'Décrocher un lé';};
 $('pv').onclick=()=>setStep(step-1);$('nx').onclick=()=>setStep(step+1);
 const ptrs=new Map();let pinch=0;
 wrap.addEventListener('pointerdown',e=>{ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});goal=null;wrap.setPointerCapture(e.pointerId);wrap.style.cursor='grabbing';if(ptrs.size===2){const a=[...ptrs.values()];pinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);}});
@@ -159,7 +161,7 @@ function loop(){if(goal){let done=true;for(const k in goal){cur[k]+=(goal[k]-cur
 cam.position.set(cur.tx+cur.r*Math.sin(cur.ph)*Math.sin(cur.th),cur.ty+cur.r*Math.cos(cur.ph),cur.tz+cur.r*Math.sin(cur.ph)*Math.cos(cur.th));cam.lookAt(cur.tx,cur.ty,cur.tz);
 const dz=openT-openP;openP+=Math.sign(dz)*Math.min(Math.abs(dz),0.01);
 const nt=tLocks.length;locks.forEach(l=>{let off=false;const i=tLocks.indexOf(l);if(i>=0)off=openP>(i+0.5)/nt;l.A.forEach(m=>m.visible=!off&&variant==='A');l.B.forEach(m=>m.visible=!off&&variant==='B');});
-const ud=TP.userData;TP.position.z+=(ud.tz-TP.position.z)*0.06;if(Math.abs(TP.position.z-ud.tz)<0.01||ud.ty>TP.position.y-0.001)TP.position.y+=(ud.ty-TP.position.y)*0.05;
+const ud=TP.userData;TP.position.z+=(ud.tz-TP.position.z)*0.06;if(openP>0.98||ud.ty>TP.position.y-0.001)TP.position.y+=(ud.ty-TP.position.y)*0.05;
 R.render(S,cam);const w=wrap.clientWidth,h=wrap.clientHeight;
 L.forEach(l=>{if(l.v.indexOf(view)<0){l.el.style.display='none';return;}tmp.copy(l.p).project(cam);if(tmp.z>1||Math.abs(tmp.x)>1.1||Math.abs(tmp.y)>1.1){l.el.style.display='none';return;}l.el.style.display='block';l.el.style.left=((tmp.x+1)/2*w)+'px';l.el.style.top=((1-tmp.y)/2*h)+'px';});
 requestAnimationFrame(loop);}
